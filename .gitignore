@@ -1,0 +1,19 @@
+# Dependencias
+node_modules/
+__pycache__/
+*.egg-info/
+
+# Entornos
+.env
+.env.*
+.vscode/
+
+# Docker artefacts
+*.log
+docker-data/
+superset-data/
+postgres-data/
+
+# Python
+*.pyc
+*.pyo
