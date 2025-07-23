@@ -11,7 +11,6 @@ __pycache__/
 # Docker artefacts
 *.log
 docker-data/
-superset-data/
 postgres-data/
 
 # Python

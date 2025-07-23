@@ -23,7 +23,6 @@ volumes:
   kafka-data:
   zookeeper-data:
   postgres-data:
-  superset-data:
   spark-apps:
   airflow-dags:
   airflow-logs:
@@ -148,33 +147,6 @@ services:
     environment:
       - BOOTSTRAP_SERVERS=kafka:9092
       - TOPIC=truck-gps
-    networks: [lldl-net]
-
-  # -----------------------------------------------------------------------
-  # SUPERSET (EntryPoint extendido para crear admin y db)
-  # -----------------------------------------------------------------------
-  superset:
-    image: apache/superset:latest-dev
-    depends_on: [postgres]
-    ports: ["8088:8088"]
-    env_file: .env
-    entrypoint: >-
-      /bin/sh -c "\
-        superset db upgrade && \
-        superset fab create-admin \
-          --username ${SUPERSET_ADMIN_USER:-admin} \
-          --firstname Admin --lastname User \
-          --email ${SUPERSET_ADMIN_EMAIL:-admin@lldl.local} \
-          --password ${SUPERSET_ADMIN_PWD:-admin123} || true && \
-        superset init && \
-        superset run -h 0.0.0.0 -p 8088 --with-threads --reload --debug"
-    environment:
-      SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY:-superset_secret}
-      SUPERSET_DATABASE_URI: >-
-        postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
-    volumes:
-      - superset-data:/app/superset_home
-      - ./superset:/docker-entrypoint-init-scripts
     networks: [lldl-net]
 
   # -----------------------------------------------------------------------
