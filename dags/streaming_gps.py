@@ -6,7 +6,7 @@ from airflow.models.baseoperator import chain
 from airflow.operators.empty import EmptyOperator
 from datetime import timedelta
 
-PROJECT_DIR = "/Users/smerlyneusebio/SMERLYN/air/lldl-big-data-infra/spark-apps"
+PROJECT_DIR = "/Users/imac/lldl-big-data-infra"
 
 
 default_args = {"retries": 2, "retry_delay": timedelta(minutes=5)}
@@ -42,7 +42,7 @@ with DAG(
         ),
         mounts=[
             Mount(
-                "/Users/smerlyneusebio/SMERLYN/air/lldl-big-data-infra/spark-apps",
+                "${PROJECT_DIR}/spark-apps",
                 "/opt/spark-apps",
                 "bind",
                 read_only=True,
