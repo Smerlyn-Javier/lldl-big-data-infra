@@ -1,44 +1,49 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import from_json, col
-from pyspark.sql.types import StructType, StringType, DoubleType, TimestampType
+from pyspark.sql.functions import from_json, col, to_timestamp
+from pyspark.sql.types import (
+    StructType, StringType, DoubleType, TimestampType
+)
 
-schema = (
-    StructType()
+schema = (StructType()
     .add("truck_id", StringType())
+    .add("timestamp", StringType())        # primero como string ISO‑8601
     .add("lat", DoubleType())
     .add("lon", DoubleType())
-    .add("event_time", TimestampType())
+    .add("speed", DoubleType())
 )
 
-spark = (
-    SparkSession.builder
-    .appName("GPSStream")
-    .getOrCreate()
-)
+spark = (SparkSession.builder
+         .appName("GPSStream")
+         .getOrCreate())
 
-df = (
-    spark.readStream.format("kafka")
+kafka_df = (spark.readStream.format("kafka")
     .option("kafka.bootstrap.servers", "kafka:9092")
-    .option("subscribe", "gps")
-    .load()
+    .option("subscribe", "truck-gps")
+    .option("startingOffsets", "latest")
+    .load())
+
+json_df = (kafka_df
+    .selectExpr("CAST(value AS STRING) AS json")
+    .select(from_json(col("json"), schema).alias("d"))
+    .select("d.*")
+    .withColumn("timestamp",
+                to_timestamp(col("timestamp"), "yyyy-MM-dd'T'HH:mm:ssX"))
 )
 
-json_df = (
-    df.selectExpr("CAST(value AS STRING) as json")
-    .select(from_json(col("json"), schema).alias("data"))
-    .select("data.*")
-)
+def write_to_pg(batch_df, batch_id):
+    (batch_df.write
+        .mode("append")
+        .format("jdbc")
+        .option("url", "jdbc:postgresql://postgres:5432/lldl_ops_db")
+        .option("dbtable", "truck_positions")
+        .option("user", "admin")
+        .option("password", "admin")
+        .option("driver", "org.postgresql.Driver")
+        .save())
 
-(
-    json_df.writeStream
-    .format("jdbc")
+(json_df.writeStream
+    .foreachBatch(write_to_pg)
     .outputMode("append")
-    .option("url", "jdbc:postgresql://postgres:5432/lldl_ops")
-    .option("dbtable", "truck_positions")
-    .option("user", "lldl")
-    .option("password", "lldl")
-    .option("checkpointLocation", "/opt/spark-apps/checkpoints/gps")
+    .option("checkpointLocation", "/opt/spark-checkpoints/gps")
     .start()
-)
-
-spark.streams.awaitAnyTermination()
+    .awaitTermination())
