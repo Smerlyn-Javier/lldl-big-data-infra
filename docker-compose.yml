@@ -1,9 +1,9 @@
 ############################
-# COMPOSE FILE – LLDL STACK (vFinal)
+# COMPOSE FILE – LLDL STACK 
 ############################
 
 # -------------------------------------------------------------------------
-# Bloque de variables comunes para Airflow (ancla YAML)
+# Bloque de variables comunes para Airflow 
 # -------------------------------------------------------------------------
 x-airflow-env: &airflow-env
   AIRFLOW__CORE__EXECUTOR: LocalExecutor
@@ -59,7 +59,7 @@ services:
       - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
       - ALLOW_PLAINTEXT_LISTENER=yes
     ports:
-      - "19092:19092"      # Exposed broker for host tools
+      - "19092:19092"      
     networks: [lldl-net]
 
   kafka-ui:
@@ -115,10 +115,10 @@ services:
       /opt/spark/sbin/start-history-server.sh
       --properties-file /opt/spark/conf/spark-defaults.conf
     environment:
-      - SPARK_NO_DAEMONIZE=1                # para mantener el foreground
+      - SPARK_NO_DAEMONIZE=1               
       - SPARK_HISTORY_OPTS=-Dspark.history.fs.logDirectory=/opt/spark-events
     volumes:
-      - spark-events:/opt/spark-events      # mismos logs que escriben master/worker
+      - spark-events:/opt/spark-events     
     ports:
       - "18080:18080"
     networks: [lldl-net]
@@ -142,7 +142,7 @@ services:
   # GPS-beacon simulator (Kafka producer)
   # --------------------------------------------------------------------------
   gps-producer:
-    build: ./gps-producer          # Dockerfile + producer.py live here
+    build: ./gps-producer        
     depends_on: [kafka]
     environment:
       - BOOTSTRAP_SERVERS=kafka:9092
@@ -179,7 +179,7 @@ services:
       <<: *airflow-env
     command: airflow webserver
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock   # ⬅️  AÑADE ESTA LÍNEA
+      - /var/run/docker.sock:/var/run/docker.sock   
       - airflow-dags:/opt/airflow/dags
       - airflow-logs:/opt/airflow/logs
       - ./dags:/opt/airflow/dags:ro
@@ -196,7 +196,7 @@ services:
       <<: *airflow-env
     command: airflow scheduler
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock   # ⬅️  AÑADE ESTA LÍNEA
+      - /var/run/docker.sock:/var/run/docker.sock 
       - airflow-dags:/opt/airflow/dags
       - airflow-logs:/opt/airflow/logs
       - ./dags:/opt/airflow/dags:ro
