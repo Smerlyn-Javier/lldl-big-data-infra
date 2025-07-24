@@ -7,7 +7,7 @@ set -e
 ROOT="lldl-big-data-infra"
 
 echo "Creando árbol de directorios…"
-mkdir -p "$ROOT"/{docs/diagramas,infra/{helm,init-sql},spark-apps,dags,scripts,tests/{unit,integration}}
+mkdir -p "$ROOT"/{docs/diagramas,infra/{helm,init-sql},spark-apps,dags,tests/{unit,integration}}
 
 echo "Creando archivos vacíos principales…"
 touch "$ROOT"/{.gitignore,.env.example,README.md,docker-compose.yml}

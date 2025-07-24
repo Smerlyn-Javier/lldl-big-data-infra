@@ -6,7 +6,7 @@ from pyspark.sql.types import (
 
 schema = (StructType()
     .add("truck_id", StringType())
-    .add("timestamp", StringType())        # primero como string ISO‑8601
+    .add("timestamp", StringType()) 
     .add("lat", DoubleType())
     .add("lon", DoubleType())
     .add("speed", DoubleType())

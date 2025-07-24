@@ -12,7 +12,7 @@ producer = KafkaProducer(
     value_serializer=lambda v: json.dumps(v).encode("utf-8")
 )
 
-TRUCK_IDS = [f"LL-{i:03d}" for i in range(1, 10)]  # 10 trucks
+TRUCK_IDS = [f"LL-{i:03d}" for i in range(1, 1000)]
 
 while True:
     msg = {
@@ -20,7 +20,7 @@ while True:
         "timestamp": datetime.utcnow().isoformat(),
         "lat": float(faker.latitude()),
         "lon": float(faker.longitude()),
-        "speed": round(random.uniform(20, 90), 1)  # km/h
+        "speed": round(random.uniform(20, 90), 1)
     }
     producer.send(topic, msg)
-    time.sleep(0.5)  # 2 messages per second
+    time.sleep(0.5)

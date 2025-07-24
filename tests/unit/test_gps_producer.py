@@ -1,5 +1,5 @@
 import json
-from scripts.gps_producer import payload  # refactoriza si tu script cambia
+from gps_producer.producer import payload  
 
 def test_payload_keys():
     sample = payload()

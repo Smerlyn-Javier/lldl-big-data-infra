@@ -26,7 +26,7 @@ with DAG(
         task_id="submit_spark_job",
         image="bitnami/spark:3.5.0",
         api_version="auto",
-        auto_remove=False,             # mantener contenedor si falla
+        auto_remove=False,           
         tty=True,
         command=(
             "bash -c 'set -eo pipefail; "
